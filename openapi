@@ -1,0 +1,80 @@
+openapi: 3.0.1
+info:
+  title: Book Store
+  version: '1.0'
+  description: An api for a book store
+  termsOfService: http://www.example.com
+  contact:
+    email: support@example.com
+    name: Support
+    url: http://www.example.com/contact
+  license:
+    name: License
+    url: http://www.example.com/license
+servers:
+  - url: https://my-json-server.typicode.com/bearc0025/api
+    variables: {}
+    description: Users API
+  - url: https://my-json-server.typicode.com/Jgvictoria/api
+    variables: {}
+    description: Users API
+paths:
+  /users:
+    summary: user level operations
+    description: create and fetch users
+    get:
+      summary: fetch users
+      description: fetch users from server
+      operationId: fetchUsers
+      responses:
+        '200':
+          description: successful fetch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "1234abc"
+                  username:
+                    type: string
+                    example: "bear"
+                  score:
+                    type: integer
+                    example: 55
+                  active:
+                    type: boolean
+                    example: false
+        default:
+          description: Default error sample response
+      tags:
+        - users
+  /attempts:
+    summary: attempts level operations
+    description: create and fetch attempts
+    get:
+      summary: fetch attempts
+      description: fetch attempts from server
+      operationId: fetchAttemptss
+      responses:
+        '200':
+          description: successful fetch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "a1"
+                  score:
+                    type: integer
+                    example: 55
+                  userId:
+                    type: string
+                    example: "qwerty"
+        default:
+          description: Default error sample response
+      tags:
+        - attempts
