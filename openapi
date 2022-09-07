@@ -12,12 +12,24 @@ info:
     name: License
     url: http://www.example.com/license
 servers:
-  - url: https://my-json-server.typicode.com/bearc0025/api
+  - url: http://localhost:3000/
     variables: {}
-    description: Users API
-  - url: https://my-json-server.typicode.com/Jgvictoria/api
-    variables: {}
-    description: Users API
+    description: Local fake server
+  - url: https://my-json-server.typicode.com/{githubaccount}/{reponame}
+    variables:
+      githubaccount:
+        default: Jgvictoria
+        enum:
+          - bearc0025
+          - Jgvictoria
+        description: 'bearc0025: his account, Jgvictoria: my account'
+      reponame:
+        default: api
+        enum:
+          - api
+          - api
+        description: 'api: his repo, api: my repo'
+    description: Online fake server
 paths:
   /users:
     summary: user level operations
@@ -28,24 +40,34 @@ paths:
       operationId: fetchUsers
       responses:
         '200':
-          description: successful fetch
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "1234abc"
-                  username:
-                    type: string
-                    example: "bear"
-                  score:
-                    type: integer
-                    example: 55
-                  active:
-                    type: boolean
-                    example: false
+          $ref: '#/components/responses/UserArrayResponseBody'
+        default:
+          description: Default error sample response
+      tags:
+        - users
+    post:
+      summary: create user
+      description: stores a user on the server
+      operationId: createUser
+      requestBody:
+        $ref: '#/components/requestBodies/UserPostBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/UserResponseBody'
+      tags:
+        - users
+  /users/{userId}:
+    summary: specific user operations
+    description: fetch, create, update and delete user
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      summary: fetch a user
+      description: fetch user form the server
+      operationId: fetchUser
+      responses:
+        '200':
+          $ref: '#/components/schemas/FullUser'
         default:
           description: Default error sample response
       tags:
@@ -56,25 +78,119 @@ paths:
     get:
       summary: fetch attempts
       description: fetch attempts from server
-      operationId: fetchAttemptss
+      operationId: fetchAttempts
       responses:
         '200':
-          description: successful fetch
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "a1"
-                  score:
-                    type: integer
-                    example: 55
-                  userId:
-                    type: string
-                    example: "qwerty"
+          $ref: '#/components/responses/AttemptArrayResponseBody'
         default:
           description: Default error sample response
       tags:
         - attempts
+    post:
+      summary: create attempt
+      description: stores an attempt on the server
+      operationId: createAttempt
+      requestBody:
+        $ref: '#/components/requestBodies/AttemptPostBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/AttemptResponseBody'
+        default:
+          description: Default error sample response
+      tags:
+        - attempts
+components:
+  parameters:
+    UserId:
+      name: userId
+      required: true
+      in: path
+      schema:
+        type: string
+        example: qwerty
+  requestBodies:
+    UserPostBody:
+      description: post for new user
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostNewUser'
+    AttemptPostBody:
+      description: post for new attempt
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostNewAttempt'
+  responses:
+    UserArrayResponseBody:
+      description: array of users
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserArray'
+    UserResponseBody:
+      description: successful response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FullUser'
+    AttemptResponseBody:
+      description: successful response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FullAttempt'
+    AttemptArrayResponseBody:
+      description: array of users
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AttemptArray'
+  schemas:
+    UserArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/FullUser'
+    PostNewUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: bear
+        score:
+          type: integer
+          example: 55
+        active:
+          type: boolean
+          example: false
+    FullUser:
+      allOf:
+        - $ref: '#/components/schemas/PostNewUser'
+        - type: object
+          properties:
+            id:
+              type: string
+              example: 1234abc
+    AttemptArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/FullAttempt'
+    PostNewAttempt:
+      type: object
+      properties:
+        score:
+          type: integer
+          example: 55
+        userId:
+          type: string
+          example: qwerty
+    FullAttempt:
+      allOf:
+        - $ref: '#/components/schemas/PostNewAttempt'
+        - type: object
+          properties:
+            id:
+              type: string
+              example: a1
